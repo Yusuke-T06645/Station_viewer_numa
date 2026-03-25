@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Station 3D Model</title>
+
+  <!-- model-viewer -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+
+    model-viewer {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+      background: #000;
+    }
+
+    /* Loading overlay */
+    #loading {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: #000;
+      color: #ddd;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+        "Noto Sans JP", "Hiragino Sans", "Meiryo", sans-serif;
+      z-index: 9999;
+    }
+
+    #loadingTitle {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    /* Indeterminate progress bar（擬似進捗） */
+    #bar {
+      width: min(560px, 84vw);
+      height: 10px;
+      background: #222;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    #barInner {
+      height: 100%;
+      width: 30%;
+      background: #6aa9ff;
+      border-radius: 999px;
+      animation: indeterminate 1.2s infinite ease-in-out;
+    }
+
+    @keyframes indeterminate {
+      0%   { transform: translateX(-140%); }
+      100% { transform: translateX(340%); }
+    }
+
+    #hint {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    /* Error state */
+    #loading.error #barInner {
+      animation: none;
+      width: 100%;
+      background: #ff6a6a;
+      transform: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loading">
+    <div id="loadingTitle">3Dモデルを読み込み中…</div>
+    <div id="bar"><div id="barInner"></div></div>
+    <div id="hint">初回は少し時間がかかる場合があります</div>
+  </div>
+
+  <model-viewer
+    id="viewer"
+    src="station_numa_draco.glb?v=1"
+    alt="Station 3D model"
+    camera-controls
+    auto-rotate
+    environment-image="neutral"
+    exposure="1.2"
+    shadow-intensity="1"
+    loading="eager"
+    reveal="auto">
+  </model-viewer>
+
+  <script>
+    const viewer = document.getElementById('viewer');
+    const loading = document.getElementById('loading');
+    const loadingTitle = document.getElementById('loadingTitle');
+
+    viewer.addEventListener('load', () => {
+      loading.style.display = 'none';
+      console.log('Model loaded.');
+    });
+
+    viewer.addEventListener('error', (e) => {
+      loading.classList.add('error');
+      loadingTitle.textContent = '読み込みに失敗しました（F12→Consoleを確認）';
+      console.error('model-viewer error:', e);
+    });
+  </script>
+</body>
+</html>
